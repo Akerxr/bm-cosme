@@ -7,72 +7,84 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-    body { background: #fff5f8; padding: 20px 10px; color: #333; max-width: 650px; margin: auto; }
-    
+    body { background: #fff5f8; padding: 20px 10px 40px 10px; color: #333; max-width: 650px; margin: auto; position: relative; min-height: 100vh; }
     .card { background: #fff; padding: 20px; border-radius: 16px; box-shadow: 0 5px 20px rgba(216,27,96,0.08); margin-bottom: 25px; }
     h2, h3 { color: #d81b60; text-align: center; margin-top: 0; font-weight: 800; }
-    
     .form-group { margin-bottom: 12px; }
     label { display: block; font-weight: 700; margin-bottom: 5px; font-size: 14px; color: #444; }
     input, select { width: 100%; padding: 11px; border: 1px solid #f0b6ca; border-radius: 10px; outline: none; font-size: 14px; }
     input:focus, select:focus { border-color: #d81b60; }
-    
     button.submit-btn { width: 100%; background: #d81b60; color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 16px; margin-top: 10px; box-shadow: 0 4px 12px rgba(216,27,96,0.2); }
-    
     .product-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ffe4ed; padding: 12px 0; gap: 10px; }
     .product-info { display: flex; align-items: center; gap: 10px; }
     .product-thumb { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; background: #fff0f5; }
-    
     button.delete-btn { background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 13px; }
-    
     #msg { text-align: center; margin-top: 12px; font-weight: 700; }
     .loader { text-align: center; color: #888; font-weight: 700; padding: 20px; }
+    
+    /* بصمة الأدمنز في الأسفل على اليمين */
+    .admin-signature {
+      text-align: right;
+      padding: 15px 5px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #d81b60;
+      opacity: 0.85;
+    }
   </style>
 </head>
 <body>
 
-  <!-- سيكشن إضافة منتج -->
   <div class="card">
     <h2>🎀 إضافة منتج جديد</h2>
-    <div class="form-group"><label>اسم المنتج</label><input type="text" id="p-name" placeholder="مثال: سيروم الوجة"></div>
+    <div class="form-group"><label>اسم المنتج</label><input type="text" id="p-name" placeholder="مثال: EVA Senses Shower Cream"></div>
     <div class="form-group"><label>القسم</label>
       <select id="p-category">
+        <option value="Body Care">Body Care</option>
         <option value="Skin Care">Skin Care</option>
         <option value="Hair Care">Hair Care</option>
-        <option value="Body Care">Body Care</option>
         <option value="Kids">Kids</option>
         <option value="Korean">Korean</option>
       </select>
     </div>
-    <div class="form-group"><label>السعر الحالي (EGP)</label><input type="number" id="p-price" placeholder="150"></div>
-    <div class="form-group"><label>السعر القديم قبل الخصم (اختياري)</label><input type="number" id="p-old-price" placeholder="200"></div>
-    <div class="form-group"><label>رابط الصورة (Image URL)</label><input type="url" id="p-image" placeholder="https://example.com/image.jpg"></div>
+    <div class="form-group"><label>السعر الحالي (EGP)</label><input type="number" id="p-price" placeholder="90"></div>
+    <div class="form-group"><label>السعر القديم (اختياري)</label><input type="number" id="p-old-price" placeholder="120"></div>
+    <div class="form-group"><label>رابط الصورة الكامل (Image URL)</label><input type="text" id="p-image" placeholder="https://i.postimg.cc/.../image.jpg"></div>
     
     <button class="submit-btn" onclick="addProduct()">حفظ ونشر المنتج 🚀</button>
     <div id="msg"></div>
   </div>
 
-  <!-- سيكشن التحكم والحذف -->
   <div class="card">
-    <h3>⚙️ إدارة المنتجات الحالية</h3>
+    <h3>⚙️ إدارة المنتجات المضافة جديداً</h3>
     <div id="admin-list" class="loader">جاري تحميل المنتجات...</div>
+  </div>
+
+  <!-- توقيع الأدمنز على اليمين تحت -->
+  <div class="admin-signature">
+    Admin bdoor & Admin menna ✨
   </div>
 
 <script>
   const API_URL = "https://script.google.com/macros/s/AKfycbxuhkV4WNIGzGqSSbPdYSNn7aD6OGlFJEF2B-p5olu4ylh2xh_hH2yZ3SroGXslnBiIHg/exec";
 
   async function addProduct() {
-    const name = document.getElementById("p-name").value;
+    const name = document.getElementById("p-name").value.trim();
     const category = document.getElementById("p-category").value;
-    const price = document.getElementById("p-price").value;
-    const oldPrice = document.getElementById("p-old-price").value;
-    const imageUrl = document.getElementById("p-image").value;
+    const price = document.getElementById("p-price").value.trim();
+    const oldPrice = document.getElementById("p-old-price").value.trim();
+    let imageUrl = document.getElementById("p-image").value.trim();
     const msg = document.getElementById("msg");
 
-    if(!name || !price || !imageUrl) {
+    if (!name || !price || !imageUrl) {
       msg.style.color = "red";
       msg.innerText = "برجاء كتابة الاسم والسعر ورابط الصورة!";
       return;
+    }
+
+    // تصحيح تلقائي للرابط لو نسيت تحط https أو postimg
+    if (!imageUrl.startsWith("http")) {
+      imageUrl = "https://i.postimg.cc/" + imageUrl;
     }
 
     msg.style.color = "#d81b60";
@@ -81,7 +93,16 @@
     try {
       await fetch(API_URL, {
         method: "POST",
-        body: JSON.stringify({ action: "add", name, category, new_price: price, old_price: oldPrice, image_url: imageUrl })
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({
+          action: "add",
+          name: name,
+          category: category,
+          new_price: price,
+          old_price: oldPrice,
+          image_url: imageUrl
+        })
       });
 
       msg.style.color = "green";
@@ -92,7 +113,7 @@
       document.getElementById("p-old-price").value = "";
       document.getElementById("p-image").value = "";
       
-      loadAdminProducts();
+      setTimeout(loadAdminProducts, 1500);
     } catch(err) {
       msg.style.color = "red";
       msg.innerText = "حدث خطأ أثناء الإضافة، حاول مجدداً.";
@@ -105,8 +126,8 @@
       const res = await fetch(API_URL);
       const products = await res.json();
 
-      if(!products || products.length === 0) {
-        listDiv.innerHTML = "<div class='loader'>لا توجد منتجات مضافة حالياً.</div>";
+      if (!products || products.length === 0) {
+        listDiv.innerHTML = "<div class='loader'>لا توجد منتجات مضافة عبر الشيت حالياً.</div>";
         return;
       }
 
@@ -119,7 +140,7 @@
             <img src="${p.image_url || 'https://via.placeholder.com/50'}" class="product-thumb" onerror="this.src='https://via.placeholder.com/50'">
             <div>
               <div style="font-weight:700;">${p.name}</div>
-              <div style="font-size:12px; color:#888;">${p.new_price} EGP</div>
+              <div style="font-size:12px; color:#888;">${p.new_price} EGP (${p.category || 'عام'})</div>
             </div>
           </div>
           <button class="delete-btn" onclick="deleteProduct('${p.id}')">حذف 🗑️</button>
@@ -127,7 +148,7 @@
         listDiv.appendChild(row);
       });
     } catch(err) {
-      listDiv.innerHTML = "<div style='color:red; text-align:center;'>خطأ في تحميل قائمة المنتجات.</div>";
+      listDiv.innerHTML = "<div style='color:red; text-align:center;'>جاري التحديث...</div>";
     }
   }
 
@@ -139,10 +160,12 @@
     
     await fetch(API_URL, {
       method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
       body: JSON.stringify({ action: "delete", id: id })
     });
     
-    loadAdminProducts();
+    setTimeout(loadAdminProducts, 1500);
   }
 
   loadAdminProducts();
